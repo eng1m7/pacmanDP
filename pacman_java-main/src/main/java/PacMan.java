@@ -1,4 +1,3 @@
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -242,29 +241,32 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
                 } else if (tile == 'r') {
 
                     // Prototype: clone the red ghost
+                    
                     ghosts.add(
-                        redGhostPrototype.cloneAt(x, y)
+                       redGhostPrototype.clone(x,y)
                     );
+                    
 
                 } else if (tile == 'p') {
 
                     // Prototype: clone the pink ghost
+                    
                     ghosts.add(
-                        pinkGhostPrototype.cloneAt(x, y)
+                       pinkGhostPrototype.clone(x,y)
                     );
 
                 } else if (tile == 'b') {
 
                     // Prototype: clone the blue ghost
                     ghosts.add(
-                        blueGhostPrototype.cloneAt(x, y)
+                       blueGhostPrototype.clone(x,y)
                     );
 
                 } else if (tile == 'o') {
 
                     // Prototype: clone the orange ghost
                     ghosts.add(
-                        orangeGhostPrototype.cloneAt(x, y)
+                       orangeGhostPrototype.clone(x,y)
                     );
                 }
             }
