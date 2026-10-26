@@ -71,21 +71,21 @@ public class Block {
         if (direction == 'U') {
 
             velocityX = 0;
-            velocityY = -4;
+            velocityY = - 8;
 
         } else if (direction == 'D') {
 
             velocityX = 0;
-            velocityY = 4;
+            velocityY = 8;
 
         } else if (direction == 'L') {
 
-            velocityX = -4;
+            velocityX = -8;
             velocityY = 0;
 
         } else if (direction == 'R') {
 
-            velocityX = 4;
+            velocityX = 8;
             velocityY = 0;
         }
     }

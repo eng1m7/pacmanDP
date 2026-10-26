@@ -204,7 +204,7 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
         walls = new HashSet<Block>();
         foods = new HashSet<Block>();
         ghosts = new HashSet<Ghost>();
-
+        
         for (int r = 0; r < rowCount; r++) {
             for (int c = 0; c < columnCount; c++) {
 
