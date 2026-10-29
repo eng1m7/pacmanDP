@@ -49,7 +49,7 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
     // Ghosts: b = blue, o = orange, p = pink, r = red
     private String[] tileMap = {
         "XXXXXXXXXXXXXXXXXXX",
-        "X        L        X",
+        "X        X        X",
         "X XX XXX X XXX XX X",
         "X                 X",
         "X XX X XXXXX X XX X",
@@ -61,7 +61,7 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
         "XXXX X XXXXX X XXXX",
         "OOOX X       X XOOO",
         "XXXX X XXXXX X XXXX",
-        "X        X        X    ",      
+        "X        X        X",
         "X XX XXX X XXX XX X",
         "X  X     P     X  X",
         "XX X X XXXXX X X XX",
@@ -74,12 +74,7 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
     HashSet<Block> walls;
     HashSet<Block> foods;
     HashSet<Ghost> ghosts;
-    HashSet<Block> powerFoods;
     Block pacman;
-    
-    private SpeedSystem.SpeedComponent pacmanSpeed = new SpeedSystem.BasicSpeed();
-    
-    private long speedBoostEndTime=0;
 
     Timer gameLoop;
 
@@ -208,7 +203,6 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
     public void loadMap() {
         walls = new HashSet<Block>();
         foods = new HashSet<Block>();
-        powerFoods = new HashSet<Block>();
         ghosts = new HashSet<Ghost>();
         
         for (int r = 0; r < rowCount; r++) {
@@ -226,22 +220,11 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
                             x, y, tileSize, tileSize, wallImage
                         )
                     );
-                    //d
-                 } else if (tile == 'L') {
-    int foodSize = 10;
-    int foodX = x + (tileSize - foodSize) / 2;
-    int foodY = y + (tileSize - foodSize) / 2;
 
-    Block food = new Block(
-        foodX, foodY,
-        foodSize, foodSize,
-        powerFood
-    );
-
-    foods.add(food);
-    powerFoods.add(food);
-
-                   
+                } else if (tile == 'O') {
+                    foods.add(
+                        new Block(x, y, tileSize, tileSize, null)
+                    );
 
                 } else if (tile == 'P') {
                     pacman = new Block(
@@ -360,47 +343,8 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
             );
         }
     }
-    
-    //d
-    private void activateSpeedBoost(){
-        pacmanSpeed = new SpeedSystem.FastPacMan(new SpeedSystem.BasicSpeed());
-        
-        speedBoostEndTime= System.currentTimeMillis() + 5000;
-        
-        updatePacmanSpeed();
-    }
-    
-    private void updatePacmanSpeed() {
-
-    int speed = pacmanSpeed.getSpeed();
-
-    if (pacman.direction == 'U') {
-        pacman.velocityX = 0;
-        pacman.velocityY = -speed;
-
-    } else if (pacman.direction == 'D') {
-        pacman.velocityX = 0;
-        pacman.velocityY = speed;
-
-    } else if (pacman.direction == 'L') {
-        pacman.velocityX = -speed;
-        pacman.velocityY = 0;
-
-    } else if (pacman.direction == 'R') {
-        pacman.velocityX = speed;
-        pacman.velocityY = 0;
-    }
-}
 
     void move() {
-            // Check whether the speed boost has expired
-            if (speedBoostEndTime != 0 && System.currentTimeMillis() >= speedBoostEndTime) {
-
-            pacmanSpeed = new SpeedSystem.BasicSpeed();
-            speedBoostEndTime = 0;
-
-            updatePacmanSpeed();
-    }
         pacman.x += pacman.velocityX;
         pacman.y += pacman.velocityY;
 
@@ -491,25 +435,14 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-            // Check food collision
-            Block eatenFood = null;
-
-            for (Block food : foods) {
-                if (checkCollision(pacman, food)) {
-                    eatenFood = food;
-                    break;
-                }
-            }
-
-            if (eatenFood != null) {
-
-                foods.remove(eatenFood);
+        // Check food collision
+        for (Block food : foods) {
+            if (checkCollision(pacman, food)) {
+                foods.remove(food);
                 score += 10;
-
-                if (powerFoods.remove(eatenFood)) {
-                activateSpeedBoost();
-                }
+                break;
             }
+        }
     }
 
     public boolean checkCollision(Block a, Block b) {
@@ -546,19 +479,15 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
 
         if (e.getKeyCode() == KeyEvent.VK_UP) {
             pacman.updateDirection('U');
-            updatePacmanSpeed();
 
         } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             pacman.updateDirection('D');
-            updatePacmanSpeed();
 
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             pacman.updateDirection('L');
-            updatePacmanSpeed();
 
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             pacman.updateDirection('R');
-            updatePacmanSpeed();
         }
 
         if (pacman.direction == 'U') {
