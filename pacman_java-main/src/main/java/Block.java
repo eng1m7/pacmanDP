@@ -1,7 +1,8 @@
+import java.awt.Graphics;
 import java.awt.Image;
 import java.util.HashSet;
 
-public class Block {
+public class Block implements GameComponent{
 
     int x;
     int y;
@@ -31,6 +32,12 @@ public class Block {
 
         this.image = image;
     }
+    @Override
+    public void draw(Graphics g){
+        if (image != null){
+            g.drawImage(image, x, y, width, height,null);
+        }
+    }
 
     public void setWalls(HashSet<Block> walls) {
         this.walls = walls;
@@ -48,18 +55,12 @@ public class Block {
         this.y += this.velocityY;
 
         if (walls != null) {
-
             for (Block wall : walls) {
-
                 if (checkCollision(this, wall)) {
-
                     this.x -= this.velocityX;
                     this.y -= this.velocityY;
-
                     this.direction = prevDirection;
-
                     updateVelocity();
-
                     break;
                 }
             }

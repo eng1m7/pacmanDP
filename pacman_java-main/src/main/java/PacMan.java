@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,7 +19,7 @@ import javax.swing.Timer;
 public class PacMan extends JPanel implements ActionListener, KeyListener {
 
     private static PacMan instance;
-    
+
     private int rowCount = 21;
     private int columnCount = 19;
     private int tileSize = 32;
@@ -44,6 +45,9 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
     private Ghost pinkGhostPrototype;
     private Ghost blueGhostPrototype;
     private Ghost orangeGhostPrototype;
+
+    // Composite
+    private GameGroup gameObjects = new GameGroup();
 
     // X = wall, O = skip, P = Pac-Man, space = food
     // Ghosts: b = blue, o = orange, p = pink, r = red
@@ -204,7 +208,7 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
         walls = new HashSet<Block>();
         foods = new HashSet<Block>();
         ghosts = new HashSet<Ghost>();
-        
+
         for (int r = 0; r < rowCount; r++) {
             for (int c = 0; c < columnCount; c++) {
 
@@ -241,35 +245,49 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
                 } else if (tile == 'r') {
 
                     // Prototype: clone the red ghost
-                    
                     ghosts.add(
-                       redGhostPrototype.clone(x,y)
+                        redGhostPrototype.clone(x, y)
                     );
-                    
 
                 } else if (tile == 'p') {
 
                     // Prototype: clone the pink ghost
-                    
                     ghosts.add(
-                       pinkGhostPrototype.clone(x,y)
+                        pinkGhostPrototype.clone(x, y)
                     );
 
                 } else if (tile == 'b') {
 
                     // Prototype: clone the blue ghost
                     ghosts.add(
-                       blueGhostPrototype.clone(x,y)
+                        blueGhostPrototype.clone(x, y)
                     );
 
                 } else if (tile == 'o') {
 
                     // Prototype: clone the orange ghost
                     ghosts.add(
-                       orangeGhostPrototype.clone(x,y)
+                        orangeGhostPrototype.clone(x, y)
                     );
                 }
             }
+        }
+
+        // Composite: Add all game objects to the group
+        gameObjects = new GameGroup();
+
+        gameObjects.add(pacman);
+
+        for (Ghost ghost : ghosts) {
+            gameObjects.add(ghost);
+        }
+
+        for (Block wall : walls) {
+            gameObjects.add(wall);
+        }
+
+        for (Block food : foods) {
+            gameObjects.add(food);
         }
     }
 
@@ -281,49 +299,8 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
 
     public void draw(Graphics g) {
 
-        g.drawImage(
-            pacman.image,
-            pacman.x,
-            pacman.y,
-            pacman.width,
-            pacman.height,
-            null
-        );
-
-        for (Ghost ghost : ghosts) {
-            g.drawImage(
-                ghost.image,
-                ghost.x,
-                ghost.y,
-                ghost.width,
-                ghost.height,
-                null
-            );
-        }
-
-        for (Block wall : walls) {
-            g.drawImage(
-                wall.image,
-                wall.x,
-                wall.y,
-                wall.width,
-                wall.height,
-                null
-            );
-        }
-
-        for (Block food : foods) {
-            if (food.image != null) {
-                g.drawImage(
-                    food.image,
-                    food.x,
-                    food.y,
-                    food.width,
-                    food.height,
-                    null
-                );
-            }
-        }
+        // Composite: Draw all game objects through one group
+        gameObjects.draw(g);
 
         // Score and lives
         g.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -436,12 +413,19 @@ public class PacMan extends JPanel implements ActionListener, KeyListener {
         }
 
         // Check food collision
+        Block eatenFood = null;
+
         for (Block food : foods) {
             if (checkCollision(pacman, food)) {
-                foods.remove(food);
-                score += 10;
+                eatenFood = food;
                 break;
             }
+        }
+
+        if (eatenFood != null) {
+            foods.remove(eatenFood);
+            gameObjects.remove(eatenFood);
+            score += 10;
         }
     }
 
